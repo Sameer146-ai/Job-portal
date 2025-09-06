@@ -1,32 +1,62 @@
-import Quill from 'quill'
-import React, { useEffect, useRef, useState } from 'react'
-import { JobCategories, JobLocations } from '../assets/assets'
+import Quill from "quill";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { JobCategories, JobLocations } from "../assets/assets";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
-function AddJob() { 
-  const [title, setTitle] = useState('')
-  const [location, setLocation] = useState('Banglore')
-  const [category, setCategory] = useState('Banglore')
-  const [level, setLevel] = useState('Beginner level')
-  const [salary, setSalary] = useState('0')
+function AddJob() {
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("Banglore");
+  const [category, setCategory] = useState("Banglore");
+  const [level, setLevel] = useState("Beginner level");
+  const [salary, setSalary] = useState("0");
 
-  const editorRef = useRef(null)
-  const quillRef = useRef(null)
+  const { backendUrl, companyToken } = useContext(AppContext);
+
+  const editorRef = useRef(null);
+  const quillRef = useRef(null);
+
+  async function handleAddJob(e) {
+    e.preventDefault();
+
+    try {
+      const description = quillRef.current.root.innerHTML;
+
+      const { data } = await axios.post(
+        backendUrl + "/api/company/post-job",
+        { title, description, location, salary, category, level },
+        { headers: { token: companyToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setSalary(0);
+        setTitle("");
+        quillRef.current.root.innerHTML = "";
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
-        theme: 'snow',
-      })
+        theme: "snow",
+      });
     }
-  }, [])
+  }, []);
 
   return (
     <form
+      onSubmit={handleAddJob}
       action=""
       className="container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6"
     >
       <div className="bg-white rounded-2xl shadow-md p-5 sm:p-6 lg:p-8 flex flex-col gap-6">
-        
         {/* Job Title */}
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Job Title</p>
@@ -118,7 +148,7 @@ function AddJob() {
         </div>
       </div>
     </form>
-  )
+  );
 }
 
-export default AddJob
+export default AddJob;

@@ -44,8 +44,7 @@ function JobListing() {
       selectedCategories.includes(job.category);
 
     const matchesLocation = (job) =>
-      selectedLocation.length === 0 ||
-      selectedLocation.includes(job.location);
+      selectedLocation.length === 0 || selectedLocation.includes(job.location);
 
     const matchesTitle = (job) =>
       searchFilter.title === "" ||

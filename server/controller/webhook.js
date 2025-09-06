@@ -19,7 +19,7 @@ export async function clerkWebhooks(req, res) {
           _id: data.id,
           email: data.email_addresses?.[0]?.email_address || "",
           name: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
-          imageUrl: data.image_url || "",   // ✅ fixed
+          imageUrl: data.image_url || "", // ✅ fixed
           resume: "",
         };
         await userModel.create(userData);
@@ -46,7 +46,9 @@ export async function clerkWebhooks(req, res) {
 
       default:
         console.warn("⚠️ Unhandled Clerk event:", type);
-        return res.status(400).json({ success: false, message: "Unhandled event type" });
+        return res
+          .status(400)
+          .json({ success: false, message: "Unhandled event type" });
     }
   } catch (error) {
     console.error("❌ Webhook error:", error.message);

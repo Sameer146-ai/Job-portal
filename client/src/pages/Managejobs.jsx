@@ -1,10 +1,58 @@
-import React from 'react'
-import { manageJobsData } from '../assets/assets'
-import moment from 'moment'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useEffect } from "react";
+import { manageJobsData } from "../assets/assets";
+import moment from "moment";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 function ManageJobs() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const { backendUrl, companyToken, setJobs, jobs } = useContext(AppContext);
+
+  // functiion to fetch comapany job applicatio data
+  const fetchCompanyJobs = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/company/list-job", {
+        headers: { token: companyToken },
+      });
+      // console.log("API response:", data)
+
+      if (data.success) {
+        setJobs([...data.jobData].reverse());
+        // console.log(data.jobData)
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // change job visibility
+  async function changeJobVisibility(id) {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/company/change-visibility",
+        { id },
+        { headers: { token: companyToken } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        fetchCompanyJobs();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+  useEffect(() => {
+    if (companyToken) {
+      fetchCompanyJobs();
+    }
+  }, [companyToken]);
 
   return (
     <div className="p-6">
@@ -25,15 +73,22 @@ function ManageJobs() {
           </thead>
 
           <tbody>
-            {manageJobsData.map((job, index) => (
+            {jobs.map((job, index) => (
               <tr key={job._id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border">{index + 1}</td>
                 <td className="px-4 py-2 border">{job.title}</td>
-                <td className="px-4 py-2 border">{moment(job.date).format('ll')}</td>
+                <td className="px-4 py-2 border">
+                  {moment(job.date).format("ll")}
+                </td>
                 <td className="px-4 py-2 border">{job.location}</td>
                 <td className="px-4 py-2 border">{job.applicants}</td>
                 <td className="px-4 py-2 border text-center">
-                  <input type="checkbox" className="w-4 h-4" />
+                  <input
+                    onChange={() => changeJobVisibility(job._id)}
+                    type="checkbox"
+                    className="w-4 h-4"
+                    checked={job.visible}
+                  />
                 </td>
               </tr>
             ))}
@@ -43,7 +98,7 @@ function ManageJobs() {
         {/* Add New Job button (Desktop) */}
         <div className="flex justify-center mt-6">
           <button
-            onClick={() => navigate('/dashboard/add-job')}
+            onClick={() => navigate("/dashboard/add-job")}
             className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition"
           >
             Add New Job
@@ -53,7 +108,7 @@ function ManageJobs() {
 
       {/* ---------- Mobile Card View ---------- */}
       <div className="space-y-4 md:hidden">
-        {manageJobsData.map((job, index) => (
+        {jobs.map((job, index) => (
           <div key={job._id} className="border rounded-lg shadow p-4 bg-white">
             <div className="mb-2 flex justify-between items-center">
               <h3 className="font-semibold text-lg">{job.title}</h3>
@@ -61,18 +116,25 @@ function ManageJobs() {
             </div>
 
             <p className="text-sm">
-              <span className="font-semibold">Date:</span> {moment(job.date).format('ll')}
+              <span className="font-semibold">Date:</span>{" "}
+              {moment(job.date).format("ll")}
             </p>
             <p className="text-sm">
               <span className="font-semibold">Location:</span> {job.location}
             </p>
             <p className="text-sm">
-              <span className="font-semibold">Applications:</span> {job.applicants}
+              <span className="font-semibold">Applications:</span>{" "}
+              {job.applicants}
             </p>
 
             <div className="mt-2 flex items-center space-x-2">
               <span className="text-sm font-semibold">Visible:</span>
-              <input type="checkbox" className="w-4 h-4" />
+              <input
+                onChange={() => changeJobVisibility}
+                type="checkbox"
+                className="w-4 h-4"
+                checked={job.visible}
+              />
             </div>
           </div>
         ))}
@@ -80,7 +142,7 @@ function ManageJobs() {
         {/* Add New Job button (Mobile) */}
         <div className="flex justify-center mt-6">
           <button
-            onClick={() => navigate('/dashboard/add-job')}
+            onClick={() => navigate("/dashboard/add-job")}
             className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition"
           >
             Add New Job
@@ -88,7 +150,7 @@ function ManageJobs() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ManageJobs
+export default ManageJobs;

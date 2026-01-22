@@ -10,6 +10,7 @@ export async function getUserData(req, res) {
 
   try {
     const user = await userModel.findById(userId);
+    console.log(user)
 
     if (!user) {
       return res.json({
@@ -17,6 +18,7 @@ export async function getUserData(req, res) {
         message: "User Not Found",
       });
     }
+
 
     res.json({
       success: true,
@@ -83,7 +85,7 @@ export async function getUserJobApplications(req, res) {
 
     const applications = await jobApplicationModel
       .find({ userId })
-      .populate("userId", "name email image resume")
+      .populate("userId", "name email imageUrl resume")
       .populate("jobId", "title description location category level salary")
       .exec();
 

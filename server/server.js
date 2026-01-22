@@ -17,13 +17,10 @@ await connectDB();
 await connectCloudinary();
 
 
-// Clerk webhooks (raw body required)
-app.post(
-  '/webhooks',
-  express.raw({ type: 'application/json' }),
-  clerkWebhooks
-);
 
+// Clerk webhooks (raw body required)
+app.post('/webhooks',clerkWebhooks
+);
 
 // Middleware
 app.use(cors());
@@ -32,6 +29,7 @@ app.use(express.urlencoded({ extended: true })); // for form data
 app.use(clerkMiddleware())
 
 // Routes
+app.get('/',(req,res)=>res.json("API Working"))
 app.use('/api/company', companyRoutes);
 app.use('/api/jobs',jobRouter)
 app.use('/api/user',userRouter)

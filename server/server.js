@@ -16,6 +16,15 @@ const PORT = process.env.PORT || 5000;
 await connectDB();
 await connectCloudinary();
 
+
+// Clerk webhooks (raw body required)
+app.post(
+  '/webhooks',
+  express.raw({ type: 'application/json' }),
+  clerkWebhooks
+);
+
+
 // Middleware
 app.use(cors());
 app.use(express.json());  // normal JSON parser
@@ -27,12 +36,6 @@ app.use('/api/company', companyRoutes);
 app.use('/api/jobs',jobRouter)
 app.use('/api/user',userRouter)
 
-// Clerk webhooks (raw body required)
-app.post(
-  '/webhooks',
-  express.raw({ type: 'application/json' }),
-  clerkWebhooks
-);
 
 
 app.listen(PORT, () =>

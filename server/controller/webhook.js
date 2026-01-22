@@ -2,6 +2,9 @@ import { Webhook } from "svix";
 import userModel from "../model/user.js";
 
 export async function clerkWebhooks(req, res) {
+
+  console.log("📩 Clerk Webhook received:", req.body?.type);
+
   try {
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 

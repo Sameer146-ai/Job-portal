@@ -5,7 +5,8 @@ import jobModel from "../model/job.model.js";
 
 // Get user Data
 export async function getUserData(req, res) {
-  const userId = req.auth.userId;
+  // const userId = req.auth.userId;
+   const { userId } = req.auth();
 
   try {
     const user = await userModel.findById(userId);
@@ -33,7 +34,8 @@ export async function getUserData(req, res) {
 export async function applyForJob(req, res) {
   const { jobId } = req.body;
 
-  const userId = req.auth.userId;
+  // const userId = req.auth.userId;
+  const { userId } = req.auth();
 
   try {
     const isAlreadyApplied = await jobApplicationModel.find({ jobId, userId });
@@ -76,7 +78,8 @@ export async function applyForJob(req, res) {
 // Get User Job Applications
 export async function getUserJobApplications(req, res) {
   try {
-    const userId = req.auth.userId;
+    // const userId = req.auth.userId;
+    const { userId } = req.auth();
 
     const applications = await jobApplicationModel
       .find({ userId })
@@ -106,7 +109,8 @@ export async function getUserJobApplications(req, res) {
 // update user resume
 export async function updateUserResume(req, res) {
   try {
-    const userId = req.auth.userId;
+    // const userId = req.auth.userId;
+    const { userId } = req.auth();
     const resumeFile = req.file;
     const userData = await userModel.findById(userId);
 
